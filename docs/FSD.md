@@ -14,14 +14,17 @@
 
 ## 2. Valuation Calculation Engine (Logika Penetapan Harga Nyawa)
 Engine ini berjalan di halaman Onboarding / Settings.
-*   **Input Variables:**
-    *   `monthlyIncome` (Double): Total pendapatan sebulan.
-    *   `weeklyWorkHours` (Double): Jam kerja per minggu.
+*   **Mode Pemilihan:**
+    1.  **Mode Pekerja (Gaji):**
+        *   `monthlyIncome` = Gaji bulanan.
+        *   `monthlyWorkHours` = Jam kerja per minggu * 4.
+    2.  **Mode Pelajar (Uang Saku):**
+        *   `monthlyIncome` = Uang saku/jajan bulanan.
+        *   `monthlyWorkHours` = Jam belajar per minggu * 4.
 *   **Formula:**
-    *   `monthlyWorkHours` = `weeklyWorkHours` * 4.
     *   `hourlyRate` = `monthlyIncome` / `monthlyWorkHours`.
 *   **Validation & Edge Cases:**
-    *   **Division by Zero:** `weeklyWorkHours` **TIDAK BOLEH** `0` atau kosong. Jika 0, set default ke `1` atau cegah user untuk *Save* agar tidak terjadi error *Infinity / NaN* pada sistem.
+    *   **Division by Zero:** `monthlyWorkHours` **TIDAK BOLEH** `0` atau kosong. Jika 0, set default ke `1` atau cegah user untuk *Save* agar tidak terjadi error *Infinity / NaN* pada sistem.
     *   **Negative Values:** Tolak input angka minus.
 
 ## 3. The Crossroads Engine (Logika Kalkulator Utama)
@@ -33,7 +36,9 @@ Engine ini berjalan saat user memasukkan barang yang ingin dibeli.
     *   Jika *toggle* Paylater aktif, munculkan dua input tambahan: `durationInMonths` (Int) dan `interestRatePercentage` (Double - Bunga total, bukan per bulan untuk simplifikasi).
     *   **Formula Final Price:** `totalPrice` = `itemPrice` + (`itemPrice` * (`interestRatePercentage` / 100)).
     *   **Formula Time Cost:** `timeCost` = `totalPrice` / `hourlyRate`.
-    *   **UI Trigger:** Jika Paylater digunakan, aplikasi wajib menyuntikkan teks tambahan ke UI: *"Anda menggadaikan (timeCost / durationInMonths) Jam setiap bulannya selama (durationInMonths) bulan ke depan."*
+    *   **UI Trigger (Visceral Warning):** Jika Paylater digunakan, aplikasi wajib menampilkan teks peringatan berwarna merah terang: 
+        > *"PERINGATAN: Anda menggadaikan [X] jam hidup Anda SETIAP BULAN selama [Y] bulan ke depan."*
+        > *(X = timeCost / durationInMonths, Y = durationInMonths)*
 
 ## 4. State Management & Database Triggers
 *   **Immutable Logging:** Saat tombol "Beli (BURNED)" atau "Batal (SAVED)" ditekan, data yang dikirim ke database Isar harus berupa angka absolut hasil kalkulasi saat itu. **JANGAN** merelasikan record transaksi dengan tabel/preference `HourlyRate` yang bisa berubah di masa depan.

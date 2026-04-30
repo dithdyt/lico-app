@@ -50,6 +50,17 @@ class AppTheme {
           fontWeight: FontWeight.bold,
           color: pureWhite,
         ),
+        headlineSmall: GoogleFonts.bebasNeue(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: pureWhite,
+        ),
+        titleLarge: GoogleFonts.bebasNeue(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: pureWhite,
+          letterSpacing: 1.2,
+        ),
         bodyLarge: GoogleFonts.inter(
           fontSize: 18,
           color: pureWhite,
@@ -57,23 +68,47 @@ class AppTheme {
         ),
         bodyMedium: GoogleFonts.inter(
           fontSize: 16,
-          color: pureWhite.withOpacity(0.8),
+          color: pureWhite.withValues(alpha: 0.8),
+        ),
+        bodySmall: GoogleFonts.inter(
+          fontSize: 14,
+          color: pureWhite.withValues(alpha: 0.6),
         ),
         labelLarge: GoogleFonts.bebasNeue(
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: pureBlack,
+          color: neonYellow,
+        ),
+        labelMedium: GoogleFonts.bebasNeue(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: pureWhite,
+        ),
+      ),
+
+      // AppBar Theme
+      appBarTheme: AppBarTheme(
+        backgroundColor: pureBlack,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: neonYellow),
+        actionsIconTheme: const IconThemeData(color: neonYellow),
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.bebasNeue(
+          color: pureWhite,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.5,
         ),
       ),
 
       // Card Theme (Neo-Brutalism: Thick borders, no elevation)
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: darkGrey,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: pureWhite, width: 2.0),
-          borderRadius: BorderRadius.circular(0), // Sharp edges for brutalism
+          side: BorderSide(color: pureWhite, width: 2.0),
+          borderRadius: BorderRadius.zero,
         ),
       ),
 
@@ -87,10 +122,18 @@ class AppTheme {
             side: BorderSide(color: pureWhite, width: 2.0),
           ),
           textStyle: GoogleFonts.bebasNeue(
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
           ),
         ),
+      ),
+
+      // Text Selection Theme (Cursor)
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: neonYellow,
+        selectionColor: neonYellow,
+        selectionHandleColor: neonYellow,
       ),
 
       // Input Decoration
@@ -106,11 +149,12 @@ class AppTheme {
           borderRadius: BorderRadius.zero,
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: neonYellow, width: 3.0),
+          borderSide: BorderSide(color: neonYellow, width: 2.0),
           borderRadius: BorderRadius.zero,
         ),
         labelStyle: GoogleFonts.inter(color: pureWhite),
-        hintStyle: GoogleFonts.inter(color: pureWhite.withOpacity(0.5)),
+        hintStyle: GoogleFonts.inter(color: pureWhite.withValues(alpha: 0.4)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }
