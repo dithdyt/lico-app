@@ -3,8 +3,8 @@ import 'package:isar/isar.dart';
 part 'decision_log.g.dart';
 
 enum DecisionStatus {
-  burned,
-  saved,
+  burned, // Barang yang jadi dibeli
+  saved,  // Barang yang batal dibeli
 }
 
 @collection

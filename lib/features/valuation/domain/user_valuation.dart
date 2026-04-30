@@ -9,10 +9,10 @@ class UserValuation {
   double monthlyIncome = 0;
   double weeklyWorkHours = 0;
 
-  @ignore
+  double get monthlyWorkHours => weeklyWorkHours * 4;
+
   double get hourlyRate {
-    if (weeklyWorkHours <= 0) return 0;
-    final monthlyWorkHours = weeklyWorkHours * 4;
+    if (monthlyWorkHours == 0) return 0;
     return monthlyIncome / monthlyWorkHours;
   }
 }
