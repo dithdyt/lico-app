@@ -155,7 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       autocorrect: false,
       autofillHints: const [],
       cursorColor: _neonGreen,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         color: readOnly ? Colors.white70 : Colors.white,
         fontWeight: FontWeight.w700,
       ),

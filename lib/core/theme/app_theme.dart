@@ -152,8 +152,8 @@ class AppTheme {
           borderSide: BorderSide(color: neonYellow, width: 2.0),
           borderRadius: BorderRadius.zero,
         ),
-        labelStyle: GoogleFonts.inter(color: pureWhite),
-        hintStyle: GoogleFonts.inter(color: pureWhite.withValues(alpha: 0.4)),
+        labelStyle: const TextStyle(color: pureWhite),
+        hintStyle: TextStyle(color: pureWhite.withValues(alpha: 0.4)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );

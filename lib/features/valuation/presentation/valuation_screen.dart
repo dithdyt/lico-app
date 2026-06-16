@@ -194,7 +194,11 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                style: theme.textTheme.bodyLarge,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
                 decoration: InputDecoration(
                   hintText: _isStudent ? "Contoh: 2000000" : "Contoh: 10000000",
                 ),
@@ -215,7 +219,11 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                style: theme.textTheme.bodyLarge,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
                 decoration: const InputDecoration(hintText: "Contoh: 8"),
               ),
 

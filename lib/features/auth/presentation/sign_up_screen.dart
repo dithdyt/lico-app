@@ -185,7 +185,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         enableSuggestions: false,
         autocorrect: false,
         autofillHints: const [],
-        style: GoogleFonts.inter(
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.w700,
@@ -193,7 +193,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         cursorColor: const Color(0xFFCCFF00),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.inter(color: Colors.white38),
+          hintStyle: const TextStyle(color: Colors.white38),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
