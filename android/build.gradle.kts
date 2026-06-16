@@ -18,24 +18,28 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
-    plugins.withId("com.android.library") {
-        extensions.configure<LibraryExtension>("android") {
-            compileSdkVersion(34)
-            if (project.name == "isar_flutter_libs") {
-                namespace = "dev.isar.isar_flutter_libs"
+    if (project.name != "app") {
+        afterEvaluate {
+            if (project.hasProperty("android")) {
+                project.extensions.configure<com.android.build.gradle.BaseExtension>("android") {
+                    compileSdkVersion(34)
+                }
             }
         }
     }
 }
 
 subprojects {
-    configurations.all {
-        resolutionStrategy {
-            force("androidx.core:core:1.6.0")
-            force("androidx.core:core-ktx:1.6.0")
+    if (project.name == "isar_flutter_libs") {
+        plugins.withId("com.android.library") {
+            extensions.configure<LibraryExtension>("android") {
+                namespace = "dev.isar.isar_flutter_libs"
+            }
         }
     }
 }
+
+
 
 subprojects {
     project.evaluationDependsOn(":app")
