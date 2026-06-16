@@ -17,25 +17,30 @@ const UserValuationSchema = CollectionSchema(
   name: r'UserValuation',
   id: -6838442265628423895,
   properties: {
-    r'hourlyRate': PropertySchema(
+    r'dailyWorkHours': PropertySchema(
       id: 0,
+      name: r'dailyWorkHours',
+      type: IsarType.double,
+    ),
+    r'hourlyRate': PropertySchema(
+      id: 1,
       name: r'hourlyRate',
       type: IsarType.double,
     ),
     r'monthlyIncome': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'monthlyIncome',
       type: IsarType.double,
     ),
     r'monthlyWorkHours': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'monthlyWorkHours',
       type: IsarType.double,
     ),
-    r'weeklyWorkHours': PropertySchema(
-      id: 3,
-      name: r'weeklyWorkHours',
-      type: IsarType.double,
+    r'userId': PropertySchema(
+      id: 4,
+      name: r'userId',
+      type: IsarType.string,
     )
   },
   estimateSize: _userValuationEstimateSize,
@@ -58,6 +63,7 @@ int _userValuationEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
 }
 
@@ -67,10 +73,11 @@ void _userValuationSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDouble(offsets[0], object.hourlyRate);
-  writer.writeDouble(offsets[1], object.monthlyIncome);
-  writer.writeDouble(offsets[2], object.monthlyWorkHours);
-  writer.writeDouble(offsets[3], object.weeklyWorkHours);
+  writer.writeDouble(offsets[0], object.dailyWorkHours);
+  writer.writeDouble(offsets[1], object.hourlyRate);
+  writer.writeDouble(offsets[2], object.monthlyIncome);
+  writer.writeDouble(offsets[3], object.monthlyWorkHours);
+  writer.writeString(offsets[4], object.userId);
 }
 
 UserValuation _userValuationDeserialize(
@@ -80,9 +87,10 @@ UserValuation _userValuationDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = UserValuation();
+  object.dailyWorkHours = reader.readDouble(offsets[0]);
   object.id = id;
-  object.monthlyIncome = reader.readDouble(offsets[1]);
-  object.weeklyWorkHours = reader.readDouble(offsets[3]);
+  object.monthlyIncome = reader.readDouble(offsets[2]);
+  object.userId = reader.readString(offsets[4]);
   return object;
 }
 
@@ -101,6 +109,8 @@ P _userValuationDeserializeProp<P>(
       return (reader.readDouble(offset)) as P;
     case 3:
       return (reader.readDouble(offset)) as P;
+    case 4:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -202,6 +212,72 @@ extension UserValuationQueryWhere
 
 extension UserValuationQueryFilter
     on QueryBuilder<UserValuation, UserValuation, QFilterCondition> {
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      dailyWorkHoursEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'dailyWorkHours',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      dailyWorkHoursGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'dailyWorkHours',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      dailyWorkHoursLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'dailyWorkHours',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      dailyWorkHoursBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'dailyWorkHours',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
       hourlyRateEqualTo(
     double value, {
@@ -455,67 +531,137 @@ extension UserValuationQueryFilter
   }
 
   QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
-      weeklyWorkHoursEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
+      userIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'weeklyWorkHours',
+        property: r'userId',
         value: value,
-        epsilon: epsilon,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
-      weeklyWorkHoursGreaterThan(
-    double value, {
+      userIdGreaterThan(
+    String value, {
     bool include = false,
-    double epsilon = Query.epsilon,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'weeklyWorkHours',
+        property: r'userId',
         value: value,
-        epsilon: epsilon,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
-      weeklyWorkHoursLessThan(
-    double value, {
+      userIdLessThan(
+    String value, {
     bool include = false,
-    double epsilon = Query.epsilon,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'weeklyWorkHours',
+        property: r'userId',
         value: value,
-        epsilon: epsilon,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
-      weeklyWorkHoursBetween(
-    double lower,
-    double upper, {
+      userIdBetween(
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
-    double epsilon = Query.epsilon,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'weeklyWorkHours',
+        property: r'userId',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-        epsilon: epsilon,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterFilterCondition>
+      userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userId',
+        value: '',
       ));
     });
   }
@@ -529,6 +675,20 @@ extension UserValuationQueryLinks
 
 extension UserValuationQuerySortBy
     on QueryBuilder<UserValuation, UserValuation, QSortBy> {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
+      sortByDailyWorkHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dailyWorkHours', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
+      sortByDailyWorkHoursDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dailyWorkHours', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserValuation, UserValuation, QAfterSortBy> sortByHourlyRate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hourlyRate', Sort.asc);
@@ -570,23 +730,35 @@ extension UserValuationQuerySortBy
     });
   }
 
-  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
-      sortByWeeklyWorkHours() {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy> sortByUserId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weeklyWorkHours', Sort.asc);
+      return query.addSortBy(r'userId', Sort.asc);
     });
   }
 
-  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
-      sortByWeeklyWorkHoursDesc() {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy> sortByUserIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weeklyWorkHours', Sort.desc);
+      return query.addSortBy(r'userId', Sort.desc);
     });
   }
 }
 
 extension UserValuationQuerySortThenBy
     on QueryBuilder<UserValuation, UserValuation, QSortThenBy> {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
+      thenByDailyWorkHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dailyWorkHours', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
+      thenByDailyWorkHoursDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dailyWorkHours', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserValuation, UserValuation, QAfterSortBy> thenByHourlyRate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hourlyRate', Sort.asc);
@@ -640,23 +812,28 @@ extension UserValuationQuerySortThenBy
     });
   }
 
-  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
-      thenByWeeklyWorkHours() {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy> thenByUserId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weeklyWorkHours', Sort.asc);
+      return query.addSortBy(r'userId', Sort.asc);
     });
   }
 
-  QueryBuilder<UserValuation, UserValuation, QAfterSortBy>
-      thenByWeeklyWorkHoursDesc() {
+  QueryBuilder<UserValuation, UserValuation, QAfterSortBy> thenByUserIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weeklyWorkHours', Sort.desc);
+      return query.addSortBy(r'userId', Sort.desc);
     });
   }
 }
 
 extension UserValuationQueryWhereDistinct
     on QueryBuilder<UserValuation, UserValuation, QDistinct> {
+  QueryBuilder<UserValuation, UserValuation, QDistinct>
+      distinctByDailyWorkHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'dailyWorkHours');
+    });
+  }
+
   QueryBuilder<UserValuation, UserValuation, QDistinct> distinctByHourlyRate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'hourlyRate');
@@ -677,10 +854,10 @@ extension UserValuationQueryWhereDistinct
     });
   }
 
-  QueryBuilder<UserValuation, UserValuation, QDistinct>
-      distinctByWeeklyWorkHours() {
+  QueryBuilder<UserValuation, UserValuation, QDistinct> distinctByUserId(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'weeklyWorkHours');
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
     });
   }
 }
@@ -690,6 +867,13 @@ extension UserValuationQueryProperty
   QueryBuilder<UserValuation, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<UserValuation, double, QQueryOperations>
+      dailyWorkHoursProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'dailyWorkHours');
     });
   }
 
@@ -713,10 +897,9 @@ extension UserValuationQueryProperty
     });
   }
 
-  QueryBuilder<UserValuation, double, QQueryOperations>
-      weeklyWorkHoursProperty() {
+  QueryBuilder<UserValuation, String, QQueryOperations> userIdProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'weeklyWorkHours');
+      return query.addPropertyName(r'userId');
     });
   }
 }

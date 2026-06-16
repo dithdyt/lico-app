@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "151808496193",
+    "project_id": "lico-project-fdb71",
+    "storage_bucket": "lico-project-fdb71.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151808496193:android:53fc2f34b201648c6cecc0",
+        "android_client_info": {
+          "package_name": "com.dithdyt.lico"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8hYxuvAkPQ3xkpL-zUT2xAa7KjzbY1SQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

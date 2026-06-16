@@ -34,9 +34,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text("REALITY CHECK"),
-      ),
+      appBar: AppBar(title: const Text("REALITY CHECK")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -50,34 +48,35 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             _buildLabel("NAMA BARANG"),
             _buildBrutalTextField(
               controller: _nameController,
               hint: "Misal: MacBook Pro M3",
               onChanged: notifier.updateItemName,
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             _buildLabel("HARGA BARANG (RP)"),
             _buildBrutalTextField(
               controller: _priceController,
               hint: "0",
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              onChanged: (val) => notifier.updateItemPrice(double.tryParse(val) ?? 0),
+              onChanged: (val) =>
+                  notifier.updateItemPrice(double.tryParse(val) ?? 0),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Paylater Toggle
             _buildBrutalToggle(
               label: "GUNAKAN PAYLATER / CICILAN?",
               value: state.isPaylater,
               onChanged: notifier.togglePaylater,
             ),
-            
+
             if (state.isPaylater) ...[
               const SizedBox(height: 24),
               Row(
@@ -91,8 +90,11 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                           controller: _monthsController,
                           hint: "12",
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (val) => notifier.updateMonths(int.tryParse(val) ?? 1),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          onChanged: (val) =>
+                              notifier.updateMonths(int.tryParse(val) ?? 1),
                         ),
                       ],
                     ),
@@ -107,7 +109,9 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                           controller: _interestController,
                           hint: "0",
                           keyboardType: TextInputType.number,
-                          onChanged: (val) => notifier.updateInterest(double.tryParse(val) ?? 0),
+                          onChanged: (val) => notifier.updateInterest(
+                            double.tryParse(val) ?? 0,
+                          ),
                         ),
                       ],
                     ),
@@ -115,22 +119,24 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                 ],
               ),
             ],
-            
+
             const SizedBox(height: 48),
-            
+
             _buildBigButton(
-              label: "HITUNG HARGA NYAWA",
+              label: "HITUNG BEBAN WAKTU",
               onPressed: () {
                 if (state.itemName.isEmpty || state.itemPrice <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Isi nama dan harga barang dulu bray!")),
+                    const SnackBar(
+                      content: Text("Isi nama dan harga barang dulu bray!"),
+                    ),
                   );
                   return;
                 }
-                
+
                 notifier.calculate();
                 final newState = ref.read(calculatorNotifierProvider);
-                
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CrossroadsScreen(
@@ -153,10 +159,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   Widget _buildLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelLarge,
-      ),
+      child: Text(label, style: Theme.of(context).textTheme.labelLarge),
     );
   }
 
@@ -177,7 +180,10 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
         onChanged: onChanged,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
         cursorColor: const Color(0xFFCCFF00),
         decoration: InputDecoration(
           hintText: hint,
@@ -185,7 +191,10 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
       ),
     );
@@ -237,10 +246,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           color: const Color(0xFFCCFF00),
           border: Border.all(color: Colors.white, width: 2),
           boxShadow: const [
-            BoxShadow(
-              color: Colors.white,
-              offset: Offset(4, 4),
-            ),
+            BoxShadow(color: Colors.white, offset: Offset(4, 4)),
           ],
         ),
         child: Center(

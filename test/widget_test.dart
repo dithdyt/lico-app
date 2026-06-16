@@ -1,20 +1,24 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:lico/main.dart';
+import 'package:lico/core/utils/time_formatter.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const LicoApp());
+  group('TimeFormatter', () {
+    test('formats positive hours consistently', () {
+      expect(TimeFormatter.formatHours(0.5), '30 Menit');
+      expect(TimeFormatter.formatHours(1.5), '1 Jam 30 Menit');
+      expect(TimeFormatter.formatHours(49), '2 Hari 1 Jam');
+    });
 
-    // Basic check for LICO INITIALIZED text
-    expect(find.text('LICO INITIALIZED'), findsOneWidget);
+    test('formats negative hours with the same units as positive hours', () {
+      expect(TimeFormatter.formatHours(-0.5), '-30 Menit');
+      expect(TimeFormatter.formatHours(-119.8), '-4 Hari 23 Jam');
+      expect(TimeFormatter.formatHours(-119.4), '-4 Hari 23 Jam');
+    });
+
+    test('falls back safely for invalid numeric input', () {
+      expect(TimeFormatter.formatHours(double.nan), '0 Menit');
+      expect(TimeFormatter.formatHours(double.infinity), '0 Menit');
+      expect(TimeFormatter.formatHours(double.negativeInfinity), '0 Menit');
+    });
   });
 }

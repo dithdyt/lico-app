@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lico/features/ledger/presentation/dashboard_screen.dart';
+import 'package:lico/features/ledger/providers/ledger_provider.dart';
 import '../providers/valuation_provider.dart';
 
 class ValuationScreen extends ConsumerStatefulWidget {
@@ -13,18 +15,26 @@ class ValuationScreen extends ConsumerStatefulWidget {
 class _ValuationScreenState extends ConsumerState<ValuationScreen> {
   final _incomeController = TextEditingController();
   final _hoursController = TextEditingController();
+  String _incomeInput = '';
+  String _hoursInput = '';
   bool _isLoading = false;
   bool _isStudent = false;
+  bool _hasHydratedInitialValues = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_hasHydratedInitialValues) return;
+
       final currentValuation = ref.read(valuationNotifierProvider).value;
       if (currentValuation != null) {
-        _incomeController.text = currentValuation.monthlyIncome.toStringAsFixed(0);
-        _hoursController.text = currentValuation.weeklyWorkHours.toStringAsFixed(0);
+        _incomeInput = currentValuation.monthlyIncome.toStringAsFixed(0);
+        _hoursInput = currentValuation.dailyWorkHours.toStringAsFixed(0);
+        _incomeController.text = _incomeInput;
+        _hoursController.text = _hoursInput;
       }
+      _hasHydratedInitialValues = true;
     });
   }
 
@@ -36,14 +46,20 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
   }
 
   Future<void> _handleSave() async {
-    final income = double.tryParse(_incomeController.text) ?? 0;
-    final hours = double.tryParse(_hoursController.text) ?? 0;
+    final income = _parseNumberInput(
+      _incomeInput.isNotEmpty ? _incomeInput : _incomeController.text,
+    );
+    final hours = _parseNumberInput(
+      _hoursInput.isNotEmpty ? _hoursInput : _hoursController.text,
+    );
 
     if (income <= 0 || hours <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.red,
-          content: Text("Harap masukkan nilai yang valid dan lebih besar dari 0."),
+          content: Text(
+            "Harap masukkan nilai yang valid dan lebih besar dari 0.",
+          ),
         ),
       );
       return;
@@ -51,25 +67,72 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
 
     setState(() => _isLoading = true);
 
-    await Future.delayed(const Duration(milliseconds: 1500));
-
     try {
-      await ref.read(valuationNotifierProvider.notifier).saveValuation(
-            monthlyIncome: income,
-            weeklyWorkHours: hours,
-          );
+      await ref
+          .read(valuationNotifierProvider.notifier)
+          .saveValuation(monthlyIncome: income, dailyWorkHours: hours);
+
+      if (!mounted) return;
+
+      ref.invalidate(valuationNotifierProvider);
+      ref.invalidate(ledgerNotifierProvider);
+      await ref.read(valuationNotifierProvider.future);
+
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        (route) => false,
+      );
     } catch (e) {
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.red,
-            content: Text(e.toString()),
-          ),
+          SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
         );
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  double _parseNumberInput(String rawValue) {
+    var value = rawValue.trim().toLowerCase();
+    if (value.isEmpty) return 0;
+
+    final isMillion = value.contains('jt') || value.contains('juta');
+    value = value
+        .replaceAll('rp', '')
+        .replaceAll('idr', '')
+        .replaceAll('juta', '')
+        .replaceAll('jt', '')
+        .replaceAll(RegExp(r'\s+'), '');
+
+    value = value.replaceAll(RegExp(r'[^0-9,.\-]'), '');
+    if (value.isEmpty || value == '-' || value == ',' || value == '.') {
+      return 0;
+    }
+
+    final commaCount = ','.allMatches(value).length;
+    final dotCount = '.'.allMatches(value).length;
+    if (commaCount > 0 && dotCount > 0) {
+      value = value.replaceAll('.', '').replaceAll(',', '.');
+    } else if (commaCount > 0) {
+      value = _normalizeSingleSeparator(value, ',');
+    } else if (dotCount > 0) {
+      value = _normalizeSingleSeparator(value, '.');
+    }
+
+    final parsed = double.tryParse(value);
+    if (parsed == null || !parsed.isFinite || parsed < 0) return 0;
+    return isMillion ? parsed * 1000000 : parsed;
+  }
+
+  String _normalizeSingleSeparator(String value, String separator) {
+    final parts = value.split(separator);
+    if (parts.length <= 2 && parts.last.length != 3) {
+      return value.replaceAll(separator, '.');
+    }
+    return value.replaceAll(separator, '');
   }
 
   @override
@@ -77,8 +140,8 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: Navigator.of(context).canPop() 
-          ? AppBar(title: const Text("PENGATURAN NILAI")) 
+      appBar: Navigator.of(context).canPop()
+          ? AppBar(title: const Text("PENGATURAN NILAI"))
           : null,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -87,14 +150,12 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "BERAPA HARGA\n1 JAM HIDUP\nANDA?",
-                style: theme.textTheme.displayLarge?.copyWith(
-                  height: 0.9,
-                ),
+                "TENTUKAN\nNILAI WAKTU\nANDA",
+                style: theme.textTheme.displayLarge?.copyWith(height: 0.9),
               ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.1),
-              
+
               const SizedBox(height: 32),
-              
+
               // Mode Selection Tabs
               Row(
                 children: [
@@ -115,37 +176,47 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 48),
-              
-              _buildInputLabel(_isStudent ? "UANG SAKU BULANAN (IDR)" : "PENDAPATAN BULANAN (IDR)"),
+
+              _buildInputLabel(
+                _isStudent
+                    ? "UANG SAKU BULANAN (IDR)"
+                    : "PENDAPATAN BULANAN (IDR)",
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _incomeController,
-                keyboardType: TextInputType.number,
+                onChanged: (value) => _incomeInput = value,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 style: theme.textTheme.bodyLarge,
                 decoration: InputDecoration(
                   hintText: _isStudent ? "Contoh: 2000000" : "Contoh: 10000000",
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
-              _buildInputLabel(_isStudent ? "JAM BELAJAR PER MINGGU" : "JAM KERJA PER MINGGU"),
+
+              _buildInputLabel(
+                _isStudent ? "JAM BELAJAR PER HARI" : "JAM KERJA PER HARI",
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _hoursController,
-                keyboardType: TextInputType.number,
-                style: theme.textTheme.bodyLarge,
-                decoration: const InputDecoration(
-                  hintText: "Contoh: 40",
+                onChanged: (value) => _hoursInput = value,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
                 ),
+                style: theme.textTheme.bodyLarge,
+                decoration: const InputDecoration(hintText: "Contoh: 8"),
               ),
-              
+
               const SizedBox(height: 60),
-              
+
               _buildBigButton(),
-              
+
               const SizedBox(height: 40),
             ],
           ),
@@ -215,9 +286,6 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
   }
 
   Widget _buildInputLabel(String label) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.labelLarge,
-    );
+    return Text(label, style: Theme.of(context).textTheme.labelLarge);
   }
 }

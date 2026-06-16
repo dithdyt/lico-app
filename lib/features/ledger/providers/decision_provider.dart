@@ -1,5 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:lico/core/database/database_provider.dart';
+import 'package:lico/features/auth/providers/auth_provider.dart';
+import 'package:lico/features/ledger/providers/ledger_provider.dart';
 import '../domain/decision_log.dart';
 
 part 'decision_provider.g.dart';
@@ -16,9 +18,15 @@ class DecisionNotifier extends _$DecisionNotifier {
     required bool isPaylater,
     required DecisionStatus status,
   }) async {
+    final userId = ref.read(authControllerProvider).valueOrNull?.userId;
+    if (userId == null) {
+      throw Exception("Sesi pengguna tidak valid.");
+    }
+
     final isar = await ref.read(isarDatabaseProvider.future);
-    
+
     final log = DecisionLog()
+      ..userId = userId
       ..itemName = itemName
       ..itemPrice = itemPrice
       ..timeCostInHours = timeCostInHours
@@ -29,5 +37,22 @@ class DecisionNotifier extends _$DecisionNotifier {
     await isar.writeTxn(() async {
       await isar.decisionLogs.put(log);
     });
+
+    ref.invalidate(ledgerNotifierProvider);
+  }
+
+  Future<void> deleteDecision(int id) async {
+    final userId = ref.read(authControllerProvider).valueOrNull?.userId;
+    if (userId == null) return;
+
+    final isar = await ref.read(isarDatabaseProvider.future);
+    final log = await isar.decisionLogs.get(id);
+    if (log?.userId != userId) return;
+
+    await isar.writeTxn(() async {
+      await isar.decisionLogs.delete(id);
+    });
+
+    ref.invalidate(ledgerNotifierProvider);
   }
 }

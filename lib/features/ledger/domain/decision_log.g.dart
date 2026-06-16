@@ -47,6 +47,11 @@ const DecisionLogSchema = CollectionSchema(
       id: 5,
       name: r'timeCostInHours',
       type: IsarType.double,
+    ),
+    r'userId': PropertySchema(
+      id: 6,
+      name: r'userId',
+      type: IsarType.string,
     )
   },
   estimateSize: _decisionLogEstimateSize,
@@ -70,6 +75,7 @@ int _decisionLogEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.itemName.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
 }
 
@@ -85,6 +91,7 @@ void _decisionLogSerialize(
   writer.writeDouble(offsets[3], object.itemPrice);
   writer.writeByte(offsets[4], object.status.index);
   writer.writeDouble(offsets[5], object.timeCostInHours);
+  writer.writeString(offsets[6], object.userId);
 }
 
 DecisionLog _decisionLogDeserialize(
@@ -103,6 +110,7 @@ DecisionLog _decisionLogDeserialize(
       _DecisionLogstatusValueEnumMap[reader.readByteOrNull(offsets[4])] ??
           DecisionStatus.burned;
   object.timeCostInHours = reader.readDouble(offsets[5]);
+  object.userId = reader.readString(offsets[6]);
   return object;
 }
 
@@ -126,6 +134,8 @@ P _decisionLogDeserializeProp<P>(
           DecisionStatus.burned) as P;
     case 5:
       return (reader.readDouble(offset)) as P;
+    case 6:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -672,6 +682,140 @@ extension DecisionLogQueryFilter
       ));
     });
   }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'userId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      userIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> userIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension DecisionLogQueryObject
@@ -752,6 +896,18 @@ extension DecisionLogQuerySortBy
       sortByTimeCostInHoursDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'timeCostInHours', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
     });
   }
 }
@@ -842,6 +998,18 @@ extension DecisionLogQuerySortThenBy
       return query.addSortBy(r'timeCostInHours', Sort.desc);
     });
   }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
 }
 
 extension DecisionLogQueryWhereDistinct
@@ -881,6 +1049,13 @@ extension DecisionLogQueryWhereDistinct
       distinctByTimeCostInHours() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'timeCostInHours');
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QDistinct> distinctByUserId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
     });
   }
 }
@@ -927,6 +1102,12 @@ extension DecisionLogQueryProperty
       timeCostInHoursProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'timeCostInHours');
+    });
+  }
+
+  QueryBuilder<DecisionLog, String, QQueryOperations> userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 }
