@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -10,8 +9,6 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  static const _neonGreen = Color(0xFFCCFF00);
-
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   bool _isSaving = false;
@@ -72,11 +69,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
         title: const Text('EDIT PROFIL'),
       ),
       body: SafeArea(
@@ -85,11 +80,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLabel('Nama Lengkap'),
+              _buildLabel('NAMA LENGKAP'),
               const SizedBox(height: 10),
               _buildTextField(controller: _nameController),
               const SizedBox(height: 24),
-              _buildLabel('Email'),
+              _buildLabel('EMAIL'),
               const SizedBox(height: 10),
               _buildTextField(controller: _emailController, readOnly: true),
               const SizedBox(height: 40),
@@ -98,32 +93,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _neonGreen,
-                    foregroundColor: Colors.black,
-                    disabledBackgroundColor: Colors.white24,
-                    disabledForegroundColor: Colors.white54,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                    ),
-                  ),
                   child: _isSaving
                       ? const SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                            color: Colors.black,
+                            color: Colors.white,
                             strokeWidth: 2,
                           ),
                         )
-                      : Text(
-                          'SIMPAN PERUBAHAN',
-                          style: GoogleFonts.bebasNeue(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
+                      : const Text('SIMPAN PERUBAHAN'),
                 ),
               ),
             ],
@@ -134,12 +113,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildLabel(String label) {
+    final theme = Theme.of(context);
     return Text(
       label,
-      style: GoogleFonts.inter(
-        color: Colors.white,
-        fontSize: 13,
-        fontWeight: FontWeight.w800,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.primary.withOpacity(0.8),
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -148,33 +127,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required TextEditingController controller,
     bool readOnly = false,
   }) {
+    final theme = Theme.of(context);
     return TextField(
       controller: controller,
       readOnly: readOnly,
-      cursorColor: _neonGreen,
-      style: GoogleFonts.inter(
-        color: readOnly ? Colors.white70 : Colors.white,
-        fontWeight: FontWeight.w700,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: readOnly ? theme.colorScheme.onSurface.withOpacity(0.5) : theme.colorScheme.onSurface,
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFF111111),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: Colors.grey, width: 2),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: _neonGreen, width: 2),
-        ),
-        disabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: Colors.grey, width: 2),
-        ),
+        fillColor: readOnly ? theme.colorScheme.surface.withOpacity(0.5) : theme.colorScheme.surface,
       ),
     );
   }

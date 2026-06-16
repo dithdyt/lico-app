@@ -31,26 +31,37 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 56, 24, 32),
+          padding: const EdgeInsets.fromLTRB(24, 64, 24, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "MASUK\nKE LICO",
-                style: GoogleFonts.bebasNeue(
-                  color: Colors.white,
-                  fontSize: 82,
+                "MASUK",
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.extrabold,
                   height: 0.9,
-                  letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 44),
-              _buildLabel("EMAIL"),
+              Text(
+                "KE LICO",
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.extrabold,
+                  color: theme.colorScheme.primary,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Hitung nilai waktu dan kelola keuangan Anda dengan cara yang lebih cerdas.",
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 48),
+              _buildLabel(context, "EMAIL"),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _emailController,
@@ -58,7 +69,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 24),
-              _buildLabel("PASSWORD"),
+              _buildLabel(context, "PASSWORD"),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _passwordController,
@@ -72,23 +83,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     _isPasswordVisible
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
               _buildSubmitButton(
+                context: context,
                 label: "MASUK",
                 isLoading: isLoading,
                 onTap: _handleSignIn,
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               _buildSecondaryButton(
+                context: context,
                 label: "MASUK SEBAGAI TAMU",
                 isLoading: isLoading,
                 onTap: _handleGuestMode,
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               Center(
                 child: TextButton(
                   onPressed: isLoading
@@ -102,10 +115,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         },
                   child: Text(
                     "BELUM PUNYA AKUN? DAFTAR",
-                    style: GoogleFonts.bebasNeue(
-                      color: const Color(0xFFCCFF00),
-                      fontSize: 20,
-                      letterSpacing: 1.1,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.secondary,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -139,9 +151,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("Gagal masuk sebagai tamu. Silakan coba lagi."),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: const Text(
+            "Gagal masuk sebagai tamu. Silakan coba lagi.",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       );
     }
@@ -164,28 +179,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Future<void> _showSignInErrorDialog() {
+    final theme = Theme.of(context);
     return showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.black,
-          shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.white, width: 2),
-            borderRadius: BorderRadius.zero,
+          backgroundColor: theme.colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
           title: Text(
             "AKSES DITOLAK",
-            style: GoogleFonts.bebasNeue(
-              color: Colors.redAccent,
-              fontSize: 32,
-              letterSpacing: 1.2,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: theme.colorScheme.error,
+              fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
             "Email atau kata sandi yang Anda masukkan salah. Silakan coba lagi.",
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+            style: theme.textTheme.bodyMedium?.copyWith(
               height: 1.4,
             ),
           ),
@@ -194,9 +206,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
                 "COBA LAGI",
-                style: GoogleFonts.bebasNeue(
-                  color: const Color(0xFFCCFF00),
-                  fontSize: 20,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -206,13 +217,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 
-  Widget _buildLabel(String label) {
+  Widget _buildLabel(BuildContext context, String label) {
+    final theme = Theme.of(context);
     return Text(
       label,
-      style: GoogleFonts.bebasNeue(
-        color: const Color(0xFFCCFF00),
-        fontSize: 20,
-        letterSpacing: 1.4,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.primary.withOpacity(0.8),
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -224,100 +235,67 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: GoogleFonts.inter(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
-        cursorColor: const Color(0xFFCCFF00),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.inter(color: Colors.white38),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          suffixIcon: suffixIcon,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
+    final theme = Theme.of(context);
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: theme.textTheme.bodyLarge,
+      decoration: InputDecoration(
+        hintText: hint,
+        suffixIcon: suffixIcon,
       ),
     );
   }
 
   Widget _buildSubmitButton({
+    required BuildContext context,
     required String label,
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        width: double.infinity,
-        height: 64,
-        decoration: BoxDecoration(
-          color: const Color(0xFFCCFF00),
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: const [
-            BoxShadow(color: Colors.white, offset: Offset(5, 5)),
-          ],
-        ),
-        child: Center(
-          child: isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: Colors.black,
-                    strokeWidth: 3,
-                  ),
-                )
-              : Text(
-                  label,
-                  style: GoogleFonts.bebasNeue(
-                    color: Colors.black,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onTap,
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
                 ),
-        ),
+              )
+            : Text(label),
       ),
     );
   }
 
   Widget _buildSecondaryButton({
+    required BuildContext context,
     required String label,
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        width: double.infinity,
-        height: 56,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.white, width: 2),
+    final theme = Theme.of(context);
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: OutlinedButton(
+        onPressed: isLoading ? null : onTap,
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.4), width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: GoogleFonts.bebasNeue(
-              color: Colors.white,
-              fontSize: 22,
-              letterSpacing: 1.1,
-            ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),

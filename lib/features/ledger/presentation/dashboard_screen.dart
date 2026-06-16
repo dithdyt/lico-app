@@ -23,7 +23,6 @@ class DashboardScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
         title: userChanges.when(
           data: (user) => Text("HALO, ${_displayName(user)}"),
@@ -34,27 +33,28 @@ class DashboardScreen extends ConsumerWidget {
       drawer: const LicoAppDrawer(),
       body: ledgerAsync.when(
         data: (data) => _buildContent(context, ref, data, theme),
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: theme.colorScheme.primary),
         ),
         error: (err, stack) => Center(
           child: Text(
             "Error: $err",
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFCCFF00),
-        shape: const ContinuousRectangleBorder(
-          side: BorderSide(color: Colors.white, width: 2),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const CalculatorScreen()),
           );
         },
-        child: const Icon(Icons.add, color: Colors.black, size: 32),
+        child: const Icon(Icons.add, size: 28),
       ),
     );
   }
@@ -90,25 +90,23 @@ class DashboardScreen extends ConsumerWidget {
         children: [
           // Elegant Typography Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+            padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "NILAI 1 JAM KERJA = $hourlyRateFormatted",
-                  style: GoogleFonts.bebasNeue(
-                    color: const Color(0xFFCCFF00),
-                    fontSize: 18,
-                    letterSpacing: 2.0,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    letterSpacing: 1.5,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   "SISA WAKTU BEBAS ANDA BULAN INI",
-                  style: GoogleFonts.bebasNeue(
-                    color: Colors.white70,
-                    letterSpacing: 4.0,
-                    fontSize: 12,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2.0,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -116,38 +114,37 @@ class DashboardScreen extends ConsumerWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     remainingFormatted.toUpperCase(),
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 72,
+                    style: theme.textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.black,
                       height: 1,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   headerBreakdown,
-                  style: GoogleFonts.inter(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildSegmentedTimeGauge(data),
+                _buildSegmentedTimeGauge(context, data),
               ],
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // Daily Drain Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: _buildBrutalInfoCard(
+            child: _buildInfoCard(
+              theme: theme,
               title: "DAILY DRAIN",
               content:
-                  "HARI INI ANDA MENUKARKAN $todayBurnedFormatted WAKTU KERJA UNTUK BELANJA.",
-              accentColor: Colors.redAccent,
+                  "Hari ini Anda menukarkan $todayBurnedFormatted waktu kerja untuk berbelanja barang konsumtif.",
+              accentColor: theme.colorScheme.error,
             ),
           ),
 
@@ -156,15 +153,16 @@ class DashboardScreen extends ConsumerWidget {
           // Time Vault Preview Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: _buildBrutalInfoCard(
+            child: _buildInfoCard(
+              theme: theme,
               title: "TIME VAULT PREVIEW",
               content:
-                  "ANDA BERHASIL MENGAMANKAN $savedTotalFormatted WAKTU BEBAS DARI GODAAN BELANJA.",
-              accentColor: const Color(0xFFCCFF00),
+                  "Anda berhasil mengamankan $savedTotalFormatted waktu bebas dengan menunda godaan belanja.",
+              accentColor: const Color(0xFF10B981), // Emerald Success Green
             ),
           ),
 
-          const SizedBox(height: 48),
+          const SizedBox(height: 32),
 
           // Tab Section
           DefaultTabController(
@@ -172,19 +170,16 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(
               children: [
                 TabBar(
-                  indicatorColor: const Color(0xFFCCFF00),
-                  labelColor: const Color(0xFFCCFF00),
-                  unselectedLabelColor: Colors.white70,
-                  indicatorWeight: 4,
-                  labelStyle: GoogleFonts.bebasNeue(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                  indicatorColor: theme.colorScheme.primary,
+                  labelColor: theme.colorScheme.primary,
+                  unselectedLabelColor: theme.colorScheme.onSurface.withOpacity(0.5),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: theme.colorScheme.onSurface.withOpacity(0.05),
+                  labelStyle: theme.textTheme.labelMedium?.copyWith(
+                    letterSpacing: 1.0,
                   ),
-                  unselectedLabelStyle: GoogleFonts.bebasNeue(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                  unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(
+                    letterSpacing: 1.0,
                   ),
                   tabs: const [
                     Tab(text: "TIME VAULT"),
@@ -195,8 +190,8 @@ class DashboardScreen extends ConsumerWidget {
                   height: 400,
                   child: TabBarView(
                     children: [
-                      _buildLogList(ref, data.savedLogs),
-                      _buildLogList(ref, data.burnedLogs),
+                      _buildLogList(context, ref, data.savedLogs, isSavedLog: true),
+                      _buildLogList(context, ref, data.burnedLogs, isSavedLog: false),
                     ],
                   ),
                 ),
@@ -208,7 +203,8 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSegmentedTimeGauge(LedgerData data) {
+  Widget _buildSegmentedTimeGauge(BuildContext context, LedgerData data) {
+    final theme = Theme.of(context);
     final isDebt = data.remainingTime < 0;
     final progress = data.progress;
     final activeSegments = isDebt
@@ -216,7 +212,7 @@ class DashboardScreen extends ConsumerWidget {
         : (progress.isNaN || progress.isInfinite)
         ? 10
         : (progress * 10).clamp(0, 10).toInt();
-    final activeColor = isDebt ? Colors.redAccent : const Color(0xFFCCFF00);
+    final activeColor = isDebt ? theme.colorScheme.error : theme.colorScheme.primary;
 
     return Row(
       children: List.generate(10, (index) {
@@ -224,11 +220,15 @@ class DashboardScreen extends ConsumerWidget {
         return Expanded(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: 28,
-            margin: EdgeInsets.only(right: index == 9 ? 0 : 6),
+            height: 16,
+            margin: EdgeInsets.only(right: index == 9 ? 0 : 4),
             decoration: BoxDecoration(
-              color: isActive ? activeColor : Colors.black,
-              border: Border.all(color: Colors.white, width: 2),
+              color: isActive ? activeColor : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: theme.colorScheme.onSurface.withOpacity(0.05),
+                width: 1,
+              ),
             ),
           ),
         );
@@ -236,7 +236,8 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBrutalInfoCard({
+  Widget _buildInfoCard({
+    required ThemeData theme,
     required String title,
     required String content,
     required Color accentColor,
@@ -244,71 +245,92 @@ class DashboardScreen extends ConsumerWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: const [BoxShadow(color: Colors.white, offset: Offset(5, 5))],
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withOpacity(0.08),
+          width: 1.0,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            color: accentColor,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            child: Text(
-              title,
-              style: GoogleFonts.bebasNeue(
-                color: Colors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2.0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              color: accentColor.withOpacity(0.08),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: accentColor,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Text(
-              content,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                height: 1.5,
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Text(
+                content,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                  fontWeight: FontWeight.w600,
+                  height: 1.5,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildLogList(WidgetRef ref, List<DecisionLog> logs) {
+  Widget _buildLogList(
+    BuildContext context,
+    WidgetRef ref,
+    List<DecisionLog> logs, {
+    required bool isSavedLog,
+  }) {
+    final theme = Theme.of(context);
     if (logs.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(40.0),
         child: Container(
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white24,
-              width: 2,
-              style: BorderStyle.solid, // Fallback if dashed is too complex
+              color: theme.colorScheme.onSurface.withOpacity(0.08),
+              width: 1.5,
             ),
           ),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.inventory_2_outlined,
-                  color: Colors.white24,
+                  color: theme.colorScheme.onSurface.withOpacity(0.2),
                   size: 48,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   "BELUM ADA DATA",
-                  style: GoogleFonts.bebasNeue(
-                    color: Colors.white24,
-                    fontSize: 24,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.3),
                     letterSpacing: 2.0,
                   ),
                 ),
@@ -324,23 +346,34 @@ class DashboardScreen extends ConsumerWidget {
       itemCount: logs.length,
       itemBuilder: (context, index) {
         final log = logs[index];
-        return _buildBrutalCard(ref, log);
+        return _buildTransactionCard(context, ref, log, isSavedLog);
       },
     );
   }
 
-  Widget _buildBrutalCard(WidgetRef ref, DecisionLog log) {
+  Widget _buildTransactionCard(
+    BuildContext context,
+    WidgetRef ref,
+    DecisionLog log,
+    bool isSavedLog,
+  ) {
+    final theme = Theme.of(context);
     final formattedTime = TimeFormatter.formatHours(log.timeCostInHours);
     final formattedDate =
         "${log.createdAt.day}/${log.createdAt.month}/${log.createdAt.year}";
 
+    final timeValueColor = isSavedLog ? const Color(0xFF10B981) : theme.colorScheme.primary;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: const [BoxShadow(color: Colors.white, offset: Offset(4, 4))],
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withOpacity(0.05),
+          width: 1.0,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -351,20 +384,14 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 Text(
                   log.itemName.toUpperCase(),
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   formattedDate,
-                  style: GoogleFonts.inter(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.bodySmall,
                 ),
               ],
             ),
@@ -372,10 +399,9 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(width: 12),
           Text(
             formattedTime.toUpperCase(),
-            style: GoogleFonts.bebasNeue(
-              color: const Color(0xFFCCFF00),
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: timeValueColor,
+              fontSize: 18,
             ),
           ),
           const SizedBox(width: 8),
@@ -387,9 +413,9 @@ class DashboardScreen extends ConsumerWidget {
                   .read(decisionNotifierProvider.notifier)
                   .deleteDecision(log.id);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.delete_outline,
-              color: Colors.redAccent,
+              color: theme.colorScheme.error.withOpacity(0.8),
               size: 22,
             ),
           ),
@@ -415,31 +441,40 @@ class LicoAppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isGuest = authSession?.user == null;
+    final theme = Theme.of(context);
 
     return Drawer(
-      backgroundColor: Colors.black,
+      backgroundColor: theme.colorScheme.surface,
       child: Column(
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.white, width: 2)),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.onSurface.withOpacity(0.05),
+                  width: 1,
+                ),
+              ),
             ),
             child: Center(
               child: Text(
                 "LICO",
-                style: GoogleFonts.bebasNeue(
-                  color: const Color(0xFFCCFF00),
-                  fontSize: 48,
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.black,
+                  letterSpacing: 2,
                 ),
               ),
             ),
           ),
           _buildDrawerItem(
-            icon: Icons.dashboard,
+            context: context,
+            icon: Icons.dashboard_outlined,
             label: "DASHBOARD",
             onTap: () => Navigator.pop(context),
           ),
           _buildDrawerItem(
+            context: context,
             icon: Icons.person_outline,
             label: "EDIT PROFIL",
             onTap: () {
@@ -452,7 +487,8 @@ class LicoAppDrawer extends ConsumerWidget {
             },
           ),
           _buildDrawerItem(
-            icon: Icons.settings,
+            context: context,
+            icon: Icons.settings_outlined,
             label: "PENGATURAN NILAI WAKTU",
             onTap: () {
               Navigator.pop(context);
@@ -464,6 +500,7 @@ class LicoAppDrawer extends ConsumerWidget {
             },
           ),
           _buildDrawerItem(
+            context: context,
             icon: Icons.info_outline,
             label: "TENTANG LICO",
             onTap: () {
@@ -472,7 +509,7 @@ class LicoAppDrawer extends ConsumerWidget {
                 context: context,
                 applicationName: "LICO",
                 applicationVersion: "1.0.0",
-                applicationLegalese: "© 2024 LICO Decision Audit Tool",
+                applicationLegalese: "© 2026 LICO Decision Audit Tool",
               );
             },
           ),
@@ -480,9 +517,10 @@ class LicoAppDrawer extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
             child: _buildDrawerItem(
+              context: context,
               icon: isGuest ? Icons.login : Icons.logout,
               label: isGuest ? "MASUK" : "LOGOUT",
-              color: Colors.white70,
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
               onTap: () async {
                 Navigator.pop(context);
                 if (isGuest) {
@@ -518,19 +556,27 @@ class LicoAppDrawer extends ConsumerWidget {
   }
 
   Widget _buildDrawerItem({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-    Color color = Colors.white,
+    Color? color,
   }) {
+    final theme = Theme.of(context);
+    final activeColor = color ?? theme.colorScheme.onSurface;
+    final iconColor = color ?? theme.colorScheme.primary;
+
     return ListTile(
       leading: Icon(
         icon,
-        color: color == Colors.white ? const Color(0xFFCCFF00) : color,
+        color: iconColor,
       ),
       title: Text(
         label,
-        style: GoogleFonts.bebasNeue(color: color, fontSize: 20),
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: activeColor,
+          letterSpacing: 1.0,
+        ),
       ),
       onTap: onTap,
     );

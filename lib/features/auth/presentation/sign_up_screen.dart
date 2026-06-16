@@ -29,14 +29,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
+    final theme = Theme.of(context);
 
     ref.listen(authControllerProvider, (previous, next) {
       next.whenOrNull(
         error: (error, _) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              backgroundColor: Colors.red,
-              content: Text(error.toString()),
+              backgroundColor: theme.colorScheme.error,
+              content: Text(
+                error.toString(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           );
         },
@@ -44,28 +48,38 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 56, 24, 32),
+          padding: const EdgeInsets.fromLTRB(24, 64, 24, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "DAFTAR\nAKUN",
-                style: GoogleFonts.bebasNeue(
-                  color: Colors.white,
-                  fontSize: 82,
+                "DAFTAR",
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.extrabold,
                   height: 0.9,
-                  letterSpacing: 1.2,
                 ),
               ),
+              Text(
+                "AKUN BARU",
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.extrabold,
+                  color: theme.colorScheme.primary,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Mulai langkah awal mengelola anggaran waktu dan keuangan Anda.",
+                style: theme.textTheme.bodyMedium,
+              ),
               const SizedBox(height: 44),
-              _buildLabel("NAMA LENGKAP"),
+              _buildLabel(context, "NAMA LENGKAP"),
               const SizedBox(height: 10),
               _buildTextField(controller: _nameController, hint: "Nama Anda"),
               const SizedBox(height: 24),
-              _buildLabel("EMAIL"),
+              _buildLabel(context, "EMAIL"),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _emailController,
@@ -73,7 +87,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 24),
-              _buildLabel("PASSWORD"),
+              _buildLabel(context, "PASSWORD"),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _passwordController,
@@ -87,17 +101,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     _isPasswordVisible
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
               _buildSubmitButton(
+                context: context,
                 label: "DAFTAR",
                 isLoading: isLoading,
                 onTap: _handleSignUp,
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               Center(
                 child: TextButton(
                   onPressed: isLoading
@@ -112,10 +127,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         },
                   child: Text(
                     "SUDAH PUNYA AKUN? MASUK",
-                    style: GoogleFonts.bebasNeue(
-                      color: const Color(0xFFCCFF00),
-                      fontSize: 20,
-                      letterSpacing: 1.1,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.secondary,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -140,13 +154,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       if (!mounted) return;
 
       final messenger = ScaffoldMessenger.of(context);
+      final theme = Theme.of(context);
       Navigator.of(context).popUntil((route) => route.isFirst);
       messenger.showSnackBar(
-        const SnackBar(
-          backgroundColor: Color(0xFFCCFF00),
+        SnackBar(
+          backgroundColor: theme.colorScheme.primary,
           content: Text(
             'Pendaftaran berhasil! Silakan masuk menggunakan akun baru Anda.',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       );
@@ -155,13 +173,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-  Widget _buildLabel(String label) {
+  Widget _buildLabel(BuildContext context, String label) {
+    final theme = Theme.of(context);
     return Text(
       label,
-      style: GoogleFonts.bebasNeue(
-        color: const Color(0xFFCCFF00),
-        fontSize: 20,
-        letterSpacing: 1.4,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.primary.withOpacity(0.8),
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -173,74 +191,40 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: GoogleFonts.inter(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
-        cursorColor: const Color(0xFFCCFF00),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.inter(color: Colors.white38),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          suffixIcon: suffixIcon,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
+    final theme = Theme.of(context);
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: theme.textTheme.bodyLarge,
+      decoration: InputDecoration(
+        hintText: hint,
+        suffixIcon: suffixIcon,
       ),
     );
   }
 
   Widget _buildSubmitButton({
+    required BuildContext context,
     required String label,
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        width: double.infinity,
-        height: 64,
-        decoration: BoxDecoration(
-          color: const Color(0xFFCCFF00),
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: const [
-            BoxShadow(color: Colors.white, offset: Offset(5, 5)),
-          ],
-        ),
-        child: Center(
-          child: isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: Colors.black,
-                    strokeWidth: 3,
-                  ),
-                )
-              : Text(
-                  label,
-                  style: GoogleFonts.bebasNeue(
-                    color: Colors.black,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onTap,
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
                 ),
-        ),
+              )
+            : Text(label),
       ),
     );
   }

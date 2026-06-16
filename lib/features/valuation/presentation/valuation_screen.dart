@@ -55,10 +55,11 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
 
     if (income <= 0 || hours <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: const Text(
             "Harap masukkan nilai yang valid dan lebih besar dari 0.",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -89,7 +90,13 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
+          SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Text(
+              e.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         );
       }
     }
@@ -151,7 +158,10 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
             children: [
               Text(
                 "TENTUKAN\nNILAI WAKTU\nANDA",
-                style: theme.textTheme.displayLarge?.copyWith(height: 0.9),
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.black,
+                  height: 0.9,
+                ),
               ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.1),
 
               const SizedBox(height: 32),
@@ -177,7 +187,7 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                 ],
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 40),
 
               _buildInputLabel(
                 _isStudent
@@ -197,7 +207,7 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               _buildInputLabel(
                 _isStudent ? "JAM BELAJAR PER HARI" : "JAM KERJA PER HARI",
@@ -213,7 +223,7 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
                 decoration: const InputDecoration(hintText: "Contoh: 8"),
               ),
 
-              const SizedBox(height: 60),
+              const SizedBox(height: 48),
 
               _buildBigButton(),
 
@@ -230,21 +240,27 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         height: 50,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFCCFF00) : Colors.transparent,
-          border: Border.all(color: Colors.white, width: 2),
+          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.1),
+            width: 1.5,
+          ),
         ),
         child: Center(
           child: Text(
             label,
-            style: TextStyle(
-              color: isSelected ? Colors.black : Colors.white,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface.withOpacity(0.6),
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+              letterSpacing: 1.0,
             ),
           ),
         ),
@@ -255,37 +271,31 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
   Widget _buildBigButton() {
     return SizedBox(
       width: double.infinity,
-      height: 70,
-      child: Stack(
-        children: [
-          Positioned(
-            top: 4,
-            left: 4,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            right: 4,
-            bottom: 4,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _handleSave,
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.black)
-                  : const Text("TETAPKAN NILAI SAYA"),
-            ),
-          ),
-        ],
+      height: 56,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _handleSave,
+        child: _isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+              )
+            : const Text("TETAPKAN NILAI SAYA"),
       ),
     ).animate().scale(delay: 400.ms);
   }
 
   Widget _buildInputLabel(String label) {
-    return Text(label, style: Theme.of(context).textTheme.labelLarge);
+    final theme = Theme.of(context);
+    return Text(
+      label,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.primary.withOpacity(0.8),
+        letterSpacing: 1.2,
+      ),
+    );
   }
 }

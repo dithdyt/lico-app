@@ -33,7 +33,6 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(title: const Text("REALITY CHECK")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -42,15 +41,14 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           children: [
             Text(
               "APA YANG INGIN ANDA BELI?",
-              style: theme.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.black,
               ),
             ),
             const SizedBox(height: 32),
 
             _buildLabel("NAMA BARANG"),
-            _buildBrutalTextField(
+            _buildTextField(
               controller: _nameController,
               hint: "Misal: MacBook Pro M3",
               onChanged: notifier.updateItemName,
@@ -59,7 +57,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
             const SizedBox(height: 24),
 
             _buildLabel("HARGA BARANG (RP)"),
-            _buildBrutalTextField(
+            _buildTextField(
               controller: _priceController,
               hint: "0",
               keyboardType: TextInputType.number,
@@ -71,7 +69,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
             const SizedBox(height: 32),
 
             // Paylater Toggle
-            _buildBrutalToggle(
+            _buildToggle(
               label: "GUNAKAN PAYLATER / CICILAN?",
               value: state.isPaylater,
               onChanged: notifier.togglePaylater,
@@ -86,7 +84,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildLabel("TENOR (BULAN)"),
-                        _buildBrutalTextField(
+                        _buildTextField(
                           controller: _monthsController,
                           hint: "12",
                           keyboardType: TextInputType.number,
@@ -105,7 +103,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildLabel("BUNGA TOTAL (%)"),
-                        _buildBrutalTextField(
+                        _buildTextField(
                           controller: _interestController,
                           hint: "0",
                           keyboardType: TextInputType.number,
@@ -122,13 +120,13 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
 
             const SizedBox(height: 48),
 
-            _buildBigButton(
+            _buildSubmitButton(
               label: "HITUNG BEBAN WAKTU",
               onPressed: () {
                 if (state.itemName.isEmpty || state.itemPrice <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Isi nama dan harga barang dulu bray!"),
+                      content: Text("Isi nama dan harga barang dulu ya!"),
                     ),
                   );
                   return;
@@ -159,73 +157,68 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   Widget _buildLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+          letterSpacing: 1.2,
+        ),
+      ),
     );
   }
 
-  Widget _buildBrutalTextField({
+  Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     required Function(String) onChanged,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        keyboardType: keyboardType,
-        inputFormatters: inputFormatters,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-        cursorColor: const Color(0xFFCCFF00),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
+    final theme = Theme.of(context);
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      style: theme.textTheme.bodyLarge,
+      decoration: InputDecoration(
+        hintText: hint,
       ),
     );
   }
 
-  Widget _buildBrutalToggle({
+  Widget _buildToggle({
     required String label,
     required bool value,
     required Function(bool) onChanged,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onChanged(!value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
-          color: value ? const Color(0xFFCCFF00) : const Color(0xFF1A1A1A),
-          border: Border.all(color: Colors.white, width: 2),
+          color: value ? theme.colorScheme.primary.withOpacity(0.08) : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: value ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.1),
+            width: 1.5,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               label,
-              style: TextStyle(
-                color: value ? Colors.black : Colors.white,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Icon(
-              value ? Icons.check_box : Icons.check_box_outline_blank,
-              color: value ? Colors.black : Colors.white,
+              value ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: value ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.3),
             ),
           ],
         ),
@@ -233,32 +226,16 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     );
   }
 
-  Widget _buildBigButton({
+  Widget _buildSubmitButton({
     required String label,
     required VoidCallback onPressed,
   }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: double.infinity,
-        height: 70,
-        decoration: BoxDecoration(
-          color: const Color(0xFFCCFF00),
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: const [
-            BoxShadow(color: Colors.white, offset: Offset(4, 4)),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(label),
       ),
     );
   }

@@ -32,7 +32,6 @@ class CrossroadsScreen extends ConsumerWidget {
     final formattedItemPrice = _formatCurrency(itemPrice);
 
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -40,38 +39,48 @@ class CrossroadsScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Spacer(),
               Text(
                 "BARANG INI AKAN MENGURAS",
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.5),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               FittedBox(
                 fit: BoxFit.scaleDown,
-                child:
-                    Text(
-                          formattedTime.toUpperCase(),
-                          style: theme.textTheme.displayLarge?.copyWith(
-                            color: const Color(0xFFCCFF00),
-                            fontSize: 84,
-                            height: 1,
-                          ),
-                        )
-                        .animate()
-                        .scale(duration: 400.ms, curve: Curves.elasticOut)
-                        .shake(delay: 400.ms),
+                child: Text(
+                  formattedTime.toUpperCase(),
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.black,
+                    fontSize: 64,
+                    height: 1,
+                  ),
+                )
+                .animate()
+                .scale(duration: 400.ms, curve: Curves.elasticOut)
+                .shake(delay: 400.ms),
               ),
-              const SizedBox(height: 8),
-              Text("WAKTU KERJA ANDA.", style: theme.textTheme.displayMedium),
-              const SizedBox(height: 48),
+              const SizedBox(height: 12),
+              Text(
+                "WAKTU KERJA ANDA.",
+                style: theme.textTheme.displaySmall?.copyWith(
+                  fontWeight: FontWeight.black,
+                ),
+              ),
+              const SizedBox(height: 36),
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: theme.colorScheme.onSurface.withOpacity(0.08),
                     width: 1,
                   ),
                 ),
@@ -80,15 +89,15 @@ class CrossroadsScreen extends ConsumerWidget {
                   children: [
                     Text(
                       itemName.toUpperCase(),
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
-                      "ESTIMASI HARGA: $formattedItemPrice",
+                      "Estimasi Harga: $formattedItemPrice",
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -96,18 +105,19 @@ class CrossroadsScreen extends ConsumerWidget {
               ),
 
               if (isPaylater) ...[
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    border: Border.all(color: Colors.red, width: 2),
+                    color: theme.colorScheme.error.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.colorScheme.error.withOpacity(0.3), width: 1),
                   ),
                   child: Text(
-                    "PERINGATAN: ANDA MENGALOKASIKAN $formattedMonthlyTime WAKTU KERJA SETIAP BULAN SELAMA $months BULAN KE DEPAN.",
+                    "PERINGATAN: Anda mengalokasikan $formattedMonthlyTime waktu kerja setiap bulan selama $months bulan ke depan.",
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.red,
-                      fontWeight: FontWeight.w900,
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ).animate().shimmer(duration: 1.seconds),
@@ -115,23 +125,42 @@ class CrossroadsScreen extends ConsumerWidget {
 
               const Spacer(),
 
-              _buildBrutalButton(
-                context: context,
-                label: "BATALKAN (SELAMATKAN WAKTU)",
-                color: const Color(0xFFCCFF00),
-                onPressed: () =>
-                    _handleDecision(context, ref, DecisionStatus.saved),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981), // Emerald Success Green
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () =>
+                      _handleDecision(context, ref, DecisionStatus.saved),
+                  child: const Text("BATALKAN (SELAMATKAN WAKTU)"),
+                ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              _buildBrutalButton(
-                context: context,
-                label: "LANJUTKAN (BAKAR WAKTU)",
-                color: Colors.red,
-                textColor: Colors.white,
-                onPressed: () =>
-                    _handleDecision(context, ref, DecisionStatus.burned),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: theme.colorScheme.error.withOpacity(0.6), width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () =>
+                      _handleDecision(context, ref, DecisionStatus.burned),
+                  child: Text(
+                    "LANJUTKAN (BAKAR WAKTU)",
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -145,7 +174,6 @@ class CrossroadsScreen extends ConsumerWidget {
     WidgetRef ref,
     DecisionStatus status,
   ) async {
-    // Show a quick loading state if possible, or just the delay
     await ref
         .read(decisionNotifierProvider.notifier)
         .logDecision(
@@ -156,66 +184,12 @@ class CrossroadsScreen extends ConsumerWidget {
           status: status,
         );
 
-    // FSD 4: Action Feedback (1s delay)
     await Future.delayed(const Duration(seconds: 1));
 
     if (context.mounted) {
-      // Reset calculator state
       ref.read(calculatorNotifierProvider.notifier).reset();
-
-      // Return to Dashboard (the first screen in the stack)
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
-  }
-
-  Widget _buildBrutalButton({
-    required BuildContext context,
-    required String label,
-    required Color color,
-    Color textColor = Colors.black,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: SizedBox(
-        width: double.infinity,
-        height: 60,
-        child: Stack(
-          children: [
-            Positioned(
-              top: 4,
-              left: 4,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-              ),
-            ),
-            Positioned.fill(
-              right: 4,
-              bottom: 4,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    label,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelLarge?.copyWith(color: textColor),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   String _formatCurrency(double value) {
