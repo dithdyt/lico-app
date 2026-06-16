@@ -1,3 +1,5 @@
+import com.android.build.gradle.LibraryExtension
+
 allprojects {
     repositories {
         google()
@@ -15,6 +17,26 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure<LibraryExtension>("android") {
+            compileSdkVersion(34)
+            if (project.name == "isar_flutter_libs") {
+                namespace = "dev.isar.isar_flutter_libs"
+            }
+        }
+    }
+}
+
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.core:core:1.6.0")
+            force("androidx.core:core-ktx:1.6.0")
+        }
+    }
+}
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
