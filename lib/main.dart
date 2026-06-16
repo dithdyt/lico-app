@@ -7,10 +7,12 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/valuation/providers/valuation_provider.dart';
 import 'features/valuation/presentation/valuation_screen.dart';
 import 'features/ledger/presentation/dashboard_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const ProviderScope(child: LicoApp()));
 }
