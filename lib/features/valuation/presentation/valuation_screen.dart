@@ -188,6 +188,9 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
               TextField(
                 controller: _incomeController,
                 onChanged: (value) => _incomeInput = value,
+                enableSuggestions: false,
+                autocorrect: false,
+                autofillHints: const [],
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
@@ -206,6 +209,9 @@ class _ValuationScreenState extends ConsumerState<ValuationScreen> {
               TextField(
                 controller: _hoursController,
                 onChanged: (value) => _hoursInput = value,
+                enableSuggestions: false,
+                autocorrect: false,
+                autofillHints: const [],
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),

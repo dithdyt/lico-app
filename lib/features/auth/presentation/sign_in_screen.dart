@@ -233,6 +233,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
+        enableSuggestions: false,
+        autocorrect: false,
+        autofillHints: const [],
         style: GoogleFonts.inter(
           color: Colors.white,
           fontSize: 16,

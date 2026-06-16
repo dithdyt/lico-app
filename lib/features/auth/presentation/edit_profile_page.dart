@@ -151,6 +151,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return TextField(
       controller: controller,
       readOnly: readOnly,
+      enableSuggestions: false,
+      autocorrect: false,
+      autofillHints: const [],
       cursorColor: _neonGreen,
       style: GoogleFonts.inter(
         color: readOnly ? Colors.white70 : Colors.white,
