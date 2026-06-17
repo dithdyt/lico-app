@@ -18,6 +18,26 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
+subprojects {
+    val configureNamespace = {
+        val android = project.extensions.findByName("android")
+        if (android != null) {
+            val namespaceField = android.javaClass.getMethod("getNamespace")
+            if (namespaceField.invoke(android) == null) {
+                val setNamespaceMethod = android.javaClass.getMethod("setNamespace", String::class.java)
+                setNamespaceMethod.invoke(android, project.group.toString())
+            }
+        }
+    }
+
+    if (project.state.executed) {
+        configureNamespace()
+    } else {
+        project.afterEvaluate {
+            configureNamespace()
+        }
+    }
+}
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)

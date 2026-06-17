@@ -14,7 +14,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isSaving = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   void initState() {
@@ -28,6 +32,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -45,10 +51,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
+    final newPassword = _passwordController.text;
+    if (newPassword.isNotEmpty) {
+      if (newPassword.length < 6) {
+        _showSnackBar('Kata sandi minimal harus 6 karakter.');
+        return;
+      }
+      if (newPassword != _confirmPasswordController.text) {
+        _showSnackBar('Konfirmasi kata sandi tidak cocok.');
+        return;
+      }
+    }
+
     setState(() => _isSaving = true);
 
     try {
-      await user.updateDisplayName(newName);
+      if (newName != user.displayName) {
+        await user.updateDisplayName(newName);
+      }
+
+      if (newPassword.isNotEmpty) {
+        await user.updatePassword(newPassword);
+      }
+
       await user.reload();
 
       if (!mounted) return;
@@ -56,6 +81,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const SnackBar(content: Text('Profil berhasil diperbarui')),
       );
       Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'requires-recent-login') {
+        _showSnackBar('Untuk keamanan, silakan logout dan login kembali untuk mengubah kata sandi.');
+      } else {
+        _showSnackBar(e.message ?? 'Gagal memperbarui profil.');
+      }
     } catch (error) {
       if (!mounted) return;
       _showSnackBar('Gagal memperbarui profil. Silakan coba lagi.');
@@ -92,6 +124,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
               _buildLabel('Email'),
               const SizedBox(height: 10),
               _buildTextField(controller: _emailController, readOnly: true),
+              const SizedBox(height: 24),
+              _buildLabel('Password Baru (Kosongkan jika tidak ingin diubah)'),
+              const SizedBox(height: 10),
+              _buildTextField(
+                controller: _passwordController,
+                obscureText: !_isPasswordVisible,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() => _isPasswordVisible = !_isPasswordVisible);
+                  },
+                  icon: Icon(
+                    _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildLabel('Konfirmasi Password Baru'),
+              const SizedBox(height: 10),
+              _buildTextField(
+                controller: _confirmPasswordController,
+                obscureText: !_isConfirmPasswordVisible,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible);
+                  },
+                  icon: Icon(
+                    _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
@@ -147,10 +211,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildTextField({
     required TextEditingController controller,
     bool readOnly = false,
+    bool obscureText = false,
+    Widget? suffixIcon,
   }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
+      obscureText: obscureText,
       cursorColor: _neonGreen,
       style: GoogleFonts.inter(
         color: readOnly ? Colors.white70 : Colors.white,
@@ -163,6 +230,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           horizontal: 16,
           vertical: 16,
         ),
+        suffixIcon: suffixIcon,
         enabledBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: Colors.grey, width: 2),
