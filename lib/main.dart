@@ -7,6 +7,7 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/valuation/providers/valuation_provider.dart';
 import 'features/valuation/presentation/valuation_screen.dart';
 import 'features/ledger/presentation/dashboard_screen.dart';
+import 'features/auth/presentation/splash_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -24,13 +25,15 @@ class LicoApp extends ConsumerWidget {
       title: 'LICO',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const _AuthGate(),
+      home: const SplashScreen(),
     );
   }
 }
 
-class _AuthGate extends ConsumerWidget {
-  const _AuthGate();
+class AuthGate extends ConsumerWidget {
+  const AuthGate({super.key});
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
