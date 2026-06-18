@@ -12,6 +12,7 @@ import '../providers/ledger_provider.dart';
 import '../../calculator/presentation/calculator_screen.dart';
 import '../../valuation/presentation/valuation_screen.dart';
 import '../domain/decision_log.dart';
+import 'statistics_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -134,6 +135,36 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildSegmentedTimeGauge(data),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const StatisticsScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(color: const Color(0xFFCCFF00), width: 2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "LIHAT GRAFIK DETAIL ↗",
+                          style: GoogleFonts.bebasNeue(
+                            color: const Color(0xFFCCFF00),
+                            fontSize: 16,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -438,6 +469,18 @@ class LicoAppDrawer extends ConsumerWidget {
             icon: Icons.dashboard,
             label: "DASHBOARD",
             onTap: () => Navigator.pop(context),
+          ),
+          _buildDrawerItem(
+            icon: Icons.analytics_outlined,
+            label: "STATISTIK & GRAFIK",
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsScreen(),
+                ),
+              );
+            },
           ),
           _buildDrawerItem(
             icon: Icons.person_outline,

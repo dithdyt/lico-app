@@ -16,6 +16,7 @@ class DecisionNotifier extends _$DecisionNotifier {
     required double itemPrice,
     required double timeCostInHours,
     required bool isPaylater,
+    required String category,
     required DecisionStatus status,
   }) async {
     final userId = ref.read(authControllerProvider).valueOrNull?.userId;
@@ -31,6 +32,7 @@ class DecisionNotifier extends _$DecisionNotifier {
       ..itemPrice = itemPrice
       ..timeCostInHours = timeCostInHours
       ..isPaylater = isPaylater
+      ..category = category
       ..status = status
       ..createdAt = DateTime.now();
 

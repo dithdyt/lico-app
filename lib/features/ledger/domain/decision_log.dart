@@ -16,6 +16,7 @@ class DecisionLog {
   late double itemPrice;
   late double timeCostInHours;
   late bool isPaylater;
+  late String category;
 
   @enumerated
   late DecisionStatus status;

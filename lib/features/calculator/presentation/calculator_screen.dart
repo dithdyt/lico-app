@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isar/isar.dart';
+import 'package:lico/core/database/database_provider.dart';
+import 'package:lico/features/ledger/domain/decision_log.dart';
 import '../providers/calculator_provider.dart';
 import 'crossroads_screen.dart';
 
@@ -17,6 +20,44 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   final TextEditingController _monthsController = TextEditingController();
   final TextEditingController _interestController = TextEditingController();
 
+  final List<String> _categories = [
+    "🍔 Makanan & Kopi",
+    "🔌 Gadget & Elektronik",
+    "👕 Pakaian & Gaya Hidup",
+    "🎮 Hobi & Hiburan",
+    "🚗 Transportasi & Otomotif",
+    "💄 Perawatan & Kosmetik",
+    "📈 Investasi & Spekulasi",
+    "🏠 Properti & Aset Besar",
+    "📚 Edukasi & Karir",
+    "📦 Lainnya",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomCategories();
+  }
+
+  Future<void> _loadCustomCategories() async {
+    try {
+      final isar = await ref.read(isarDatabaseProvider.future);
+      final logs = await isar.decisionLogs.where().findAll();
+      final uniqueCategories = logs.map((l) => l.category).toSet();
+
+      setState(() {
+        for (final cat in uniqueCategories) {
+          if (!_categories.contains(cat) && cat.isNotEmpty) {
+            // Insert before "📦 Lainnya" which is at the end of the list
+            _categories.insert(_categories.length - 1, cat);
+          }
+        }
+      });
+    } catch (e) {
+      // Ignore
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -24,6 +65,92 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     _monthsController.dispose();
     _interestController.dispose();
     super.dispose();
+  }
+
+  void _addCustomCategory(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+
+    // Convert to Title Case
+    final titleCased = trimmed.split(RegExp(r'\s+')).map((w) {
+      if (w.isEmpty) return '';
+      return w[0].toUpperCase() + w.substring(1).toLowerCase();
+    }).join(' ');
+
+    String cleanString(String s) =>
+        s.replaceAll(RegExp(r'[^\w\s&]'), '').trim().toLowerCase();
+
+    final cleanInput = cleanString(titleCased);
+
+    final existingIndex = _categories.indexWhere((cat) {
+      return cleanString(cat) == cleanInput;
+    });
+
+    if (existingIndex != -1) {
+      ref
+          .read(calculatorNotifierProvider.notifier)
+          .updateCategory(_categories[existingIndex]);
+    } else {
+      final newCategoryName = "🏷️ $titleCased";
+      setState(() {
+        _categories.insert(_categories.length - 1, newCategoryName);
+      });
+      ref
+          .read(calculatorNotifierProvider.notifier)
+          .updateCategory(newCategoryName);
+    }
+  }
+
+  void _showAddCategoryDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          shape: const ContinuousRectangleBorder(
+            side: BorderSide(color: Colors.white, width: 3),
+          ),
+          title: const Text(
+            "TAMBAH KATEGORI",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            cursorColor: const Color(0xFFCCFF00),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            decoration: const InputDecoration(
+              hintText: "Contoh: Emas, Saham, Kripto",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:
+                  const Text("BATAL", style: TextStyle(color: Colors.white70)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final text = controller.text;
+                if (text.trim().isNotEmpty) {
+                  _addCustomCategory(text);
+                }
+                Navigator.pop(context);
+              },
+              child: const Text("TAMBAH"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -67,6 +194,11 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
               onChanged: (val) =>
                   notifier.updateItemPrice(double.tryParse(val) ?? 0),
             ),
+
+            const SizedBox(height: 32),
+
+            // Category Picker
+            _buildCategoryPicker(state, notifier),
 
             const SizedBox(height: 32),
 
@@ -134,6 +266,16 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                   return;
                 }
 
+                if (state.category.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Colors.redAccent,
+                      content: Text("Pilih kategori terlebih dahulu, bray!"),
+                    ),
+                  );
+                  return;
+                }
+
                 notifier.calculate();
                 final newState = ref.read(calculatorNotifierProvider);
 
@@ -145,6 +287,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                       timeCostInHours: newState.timeCostInHours,
                       isPaylater: newState.isPaylater,
                       months: newState.months,
+                      category: newState.category,
                     ),
                   ),
                 );
@@ -160,6 +303,79 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+    );
+  }
+
+  Widget _buildCategoryPicker(
+    CalculatorState state,
+    CalculatorNotifier notifier,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel("KATEGORI BARANG (WAJIB PILIH)"),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            ..._categories.map((cat) {
+              final isSelected = state.category == cat;
+              return GestureDetector(
+                onTap: () => notifier.updateCategory(cat),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFFCCFF00)
+                        : const Color(0xFF1A1A1A),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Text(
+                    cat,
+                    style: TextStyle(
+                      color: isSelected ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              );
+            }),
+            GestureDetector(
+              onTap: _showAddCategoryDialog,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: const Color(0xFFCCFF00), width: 2),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, color: Color(0xFFCCFF00), size: 16),
+                    SizedBox(width: 4),
+                    Text(
+                      "TAMBAH KATEGORI",
+                      style: TextStyle(
+                        color: Color(0xFFCCFF00),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

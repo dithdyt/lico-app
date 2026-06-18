@@ -10,6 +10,7 @@ class CalculatorState {
   final int months;
   final double interestRate;
   final double timeCostInHours;
+  final String category;
 
   CalculatorState({
     this.itemName = '',
@@ -18,6 +19,7 @@ class CalculatorState {
     this.months = 1,
     this.interestRate = 0,
     this.timeCostInHours = 0,
+    this.category = '',
   });
 
   CalculatorState copyWith({
@@ -27,6 +29,7 @@ class CalculatorState {
     int? months,
     double? interestRate,
     double? timeCostInHours,
+    String? category,
   }) {
     return CalculatorState(
       itemName: itemName ?? this.itemName,
@@ -35,6 +38,7 @@ class CalculatorState {
       months: months ?? this.months,
       interestRate: interestRate ?? this.interestRate,
       timeCostInHours: timeCostInHours ?? this.timeCostInHours,
+      category: category ?? this.category,
     );
   }
 }
@@ -51,6 +55,7 @@ class CalculatorNotifier extends _$CalculatorNotifier {
   void togglePaylater(bool value) => state = state.copyWith(isPaylater: value);
   void updateMonths(int months) => state = state.copyWith(months: months);
   void updateInterest(double rate) => state = state.copyWith(interestRate: rate);
+  void updateCategory(String category) => state = state.copyWith(category: category);
 
   void reset() {
     state = CalculatorState();

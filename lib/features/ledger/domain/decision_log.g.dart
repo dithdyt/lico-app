@@ -17,39 +17,44 @@ const DecisionLogSchema = CollectionSchema(
   name: r'DecisionLog',
   id: -3953042704646498711,
   properties: {
-    r'createdAt': PropertySchema(
+    r'category': PropertySchema(
       id: 0,
+      name: r'category',
+      type: IsarType.string,
+    ),
+    r'createdAt': PropertySchema(
+      id: 1,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'isPaylater': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'isPaylater',
       type: IsarType.bool,
     ),
     r'itemName': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'itemName',
       type: IsarType.string,
     ),
     r'itemPrice': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'itemPrice',
       type: IsarType.double,
     ),
     r'status': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'status',
       type: IsarType.byte,
       enumMap: _DecisionLogstatusEnumValueMap,
     ),
     r'timeCostInHours': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'timeCostInHours',
       type: IsarType.double,
     ),
     r'userId': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'userId',
       type: IsarType.string,
     )
@@ -74,6 +79,7 @@ int _decisionLogEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.category.length * 3;
   bytesCount += 3 + object.itemName.length * 3;
   bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
@@ -85,13 +91,14 @@ void _decisionLogSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeBool(offsets[1], object.isPaylater);
-  writer.writeString(offsets[2], object.itemName);
-  writer.writeDouble(offsets[3], object.itemPrice);
-  writer.writeByte(offsets[4], object.status.index);
-  writer.writeDouble(offsets[5], object.timeCostInHours);
-  writer.writeString(offsets[6], object.userId);
+  writer.writeString(offsets[0], object.category);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeBool(offsets[2], object.isPaylater);
+  writer.writeString(offsets[3], object.itemName);
+  writer.writeDouble(offsets[4], object.itemPrice);
+  writer.writeByte(offsets[5], object.status.index);
+  writer.writeDouble(offsets[6], object.timeCostInHours);
+  writer.writeString(offsets[7], object.userId);
 }
 
 DecisionLog _decisionLogDeserialize(
@@ -101,16 +108,17 @@ DecisionLog _decisionLogDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = DecisionLog();
-  object.createdAt = reader.readDateTime(offsets[0]);
+  object.category = reader.readString(offsets[0]);
+  object.createdAt = reader.readDateTime(offsets[1]);
   object.id = id;
-  object.isPaylater = reader.readBool(offsets[1]);
-  object.itemName = reader.readString(offsets[2]);
-  object.itemPrice = reader.readDouble(offsets[3]);
+  object.isPaylater = reader.readBool(offsets[2]);
+  object.itemName = reader.readString(offsets[3]);
+  object.itemPrice = reader.readDouble(offsets[4]);
   object.status =
-      _DecisionLogstatusValueEnumMap[reader.readByteOrNull(offsets[4])] ??
+      _DecisionLogstatusValueEnumMap[reader.readByteOrNull(offsets[5])] ??
           DecisionStatus.burned;
-  object.timeCostInHours = reader.readDouble(offsets[5]);
-  object.userId = reader.readString(offsets[6]);
+  object.timeCostInHours = reader.readDouble(offsets[6]);
+  object.userId = reader.readString(offsets[7]);
   return object;
 }
 
@@ -122,19 +130,21 @@ P _decisionLogDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
-    case 1:
-      return (reader.readBool(offset)) as P;
-    case 2:
       return (reader.readString(offset)) as P;
+    case 1:
+      return (reader.readDateTime(offset)) as P;
+    case 2:
+      return (reader.readBool(offset)) as P;
     case 3:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
       return (_DecisionLogstatusValueEnumMap[reader.readByteOrNull(offset)] ??
           DecisionStatus.burned) as P;
-    case 5:
-      return (reader.readDouble(offset)) as P;
     case 6:
+      return (reader.readDouble(offset)) as P;
+    case 7:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -243,6 +253,141 @@ extension DecisionLogQueryWhere
 
 extension DecisionLogQueryFilter
     on QueryBuilder<DecisionLog, DecisionLog, QFilterCondition> {
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> categoryEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> categoryBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'category',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition> categoryMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'category',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
+      categoryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<DecisionLog, DecisionLog, QAfterFilterCondition>
       createdAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -826,6 +971,18 @@ extension DecisionLogQueryLinks
 
 extension DecisionLogQuerySortBy
     on QueryBuilder<DecisionLog, DecisionLog, QSortBy> {
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> sortByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> sortByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -914,6 +1071,18 @@ extension DecisionLogQuerySortBy
 
 extension DecisionLogQuerySortThenBy
     on QueryBuilder<DecisionLog, DecisionLog, QSortThenBy> {
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> thenByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> thenByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<DecisionLog, DecisionLog, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -1014,6 +1183,13 @@ extension DecisionLogQuerySortThenBy
 
 extension DecisionLogQueryWhereDistinct
     on QueryBuilder<DecisionLog, DecisionLog, QDistinct> {
+  QueryBuilder<DecisionLog, DecisionLog, QDistinct> distinctByCategory(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'category', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<DecisionLog, DecisionLog, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -1065,6 +1241,12 @@ extension DecisionLogQueryProperty
   QueryBuilder<DecisionLog, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<DecisionLog, String, QQueryOperations> categoryProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'category');
     });
   }
 

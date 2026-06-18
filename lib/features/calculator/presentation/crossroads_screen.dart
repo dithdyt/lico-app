@@ -13,6 +13,7 @@ class CrossroadsScreen extends ConsumerWidget {
   final double timeCostInHours;
   final bool isPaylater;
   final int months;
+  final String category;
 
   const CrossroadsScreen({
     super.key,
@@ -21,6 +22,7 @@ class CrossroadsScreen extends ConsumerWidget {
     required this.timeCostInHours,
     required this.isPaylater,
     required this.months,
+    required this.category,
   });
 
   @override
@@ -82,6 +84,15 @@ class CrossroadsScreen extends ConsumerWidget {
                       itemName.toUpperCase(),
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "KATEGORI: ${category.toUpperCase()}",
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFFCCFF00),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -153,6 +164,7 @@ class CrossroadsScreen extends ConsumerWidget {
           itemPrice: itemPrice,
           timeCostInHours: timeCostInHours,
           isPaylater: isPaylater,
+          category: category,
           status: status,
         );
 
