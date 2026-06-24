@@ -233,7 +233,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
-        style: GoogleFonts.inter(
+        enableSuggestions: false,
+        autocorrect: false,
+        autofillHints: const [],
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.w700,
@@ -241,7 +244,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         cursorColor: const Color(0xFFCCFF00),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.inter(color: Colors.white38),
+          hintStyle: const TextStyle(color: Colors.white38),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,

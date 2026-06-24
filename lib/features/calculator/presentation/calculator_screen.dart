@@ -180,6 +180,9 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
         onChanged: onChanged,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
+        enableSuggestions: false,
+        autocorrect: false,
+        autofillHints: const [],
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
